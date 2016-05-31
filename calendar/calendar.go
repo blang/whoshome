@@ -25,9 +25,11 @@ type Calendar struct {
 	ClientTokenFile  string
 	EventTitle       string
 	PresentFunc      func(present []string) bool
+	Threshold        int
 	lastEventID      string
 	lastEventStart   time.Time
 	calSrv           *gcal.Service
+	graceCounter     int
 }
 
 func (c *Calendar) InitAuth() error {
@@ -94,6 +96,7 @@ func (c *Calendar) tick() error {
 		return err
 	}
 	if c.PresentFunc(present) {
+		c.graceCounter = 0
 		if c.lastEventID != "" {
 			log.Printf("Update event")
 			c.updateEvent()
@@ -103,7 +106,12 @@ func (c *Calendar) tick() error {
 		}
 	} else {
 		log.Printf("Not Present")
-		c.lastEventID = ""
+		if c.graceCounter > c.Threshold {
+			c.lastEventID = ""
+		}
+		if c.lastEventID != "" {
+			c.graceCounter++
+		}
 	}
 	return nil
 }

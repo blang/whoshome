@@ -19,6 +19,7 @@ var (
 	flagMAC              = flag.String("mac", "00:01:02:aa:bb:cc", "MAC to identify presence")
 	flagEventTitle       = flag.String("event-title", "Present", "Event title")
 	flagEventColorID     = flag.String("event-color-id", "11", "Event colorid")
+	flagGraceThreshold   = flag.Int("grace-threshold", 5, "Threshold how many ticks no present triggers an event")
 )
 
 func main() {
@@ -33,6 +34,7 @@ func main() {
 		ClientSecretFile: *flagClientSecretFile,
 		ClientTokenFile:  *flagTokenFile,
 		EventTitle:       *flagEventTitle,
+		Threshold:        *flagGraceThreshold,
 		PresentFunc: func(present []string) bool {
 			for _, v := range present {
 				if v == *flagEventTitle {
